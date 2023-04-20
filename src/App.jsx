@@ -1,8 +1,12 @@
 import React, {useState, useEffect} from "react";
 
 export default function App(){
-  const [text, setText] = useState("")
-  const [timeRemaining, setTimeRemaining] = useState(5)
+  const startingTime = 5
+
+  const [text, setText] = useState("");
+  const [timeRemaining, setTimeRemaining] = useState(startingTime);
+  const [isGameOn, setIsGameOn] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   
   function handleChange(e){
@@ -13,24 +17,44 @@ export default function App(){
   function calculateWordCount(text) {
     return  text.split(' ').filter(function(num){return num != ''}).length;
   }
+  function startGame(){
+    setIsGameOn(true);
+    setTimeRemaining(startingTime);
+    setWordCount(0);
+    setText("");
+  }
+
+  function endGame(){
+    setIsGameOn(false);
+    setWordCount(calculateWordCount(text));
+  }
+  
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      timeRemaining > 0 && setTimeRemaining(prevState => prevState - 1);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [timeRemaining]);
+
+    if(isGameOn && timeRemaining > 0){
+      const timer = setTimeout(() => { 
+          setTimeRemaining(prevState => prevState - 1)}, 1000);
+        return () => clearTimeout(timer);
+    } else if(timeRemaining === 0){
+          endGame();
+    }
+
+
+    }, [timeRemaining, isGameOn]);
 
 
   return(
     <main>
       <h1>How fast can you type?</h1>
       <textarea 
+        autoFocus={isGameOn}
+        disabled={!isGameOn}
         value={text} 
         onChange={handleChange}/>
       <h4>Time remaining: {timeRemaining}</h4>
-      <button onClick={() => calculateWordCount(text)}>Start Game</button>
-      <h1>Word count: ???</h1>
+      <button onClick={startGame} disabled={isGameOn}>Start Game</button>
+      <h1>Word count: {wordCount}</h1>
 
     </main>
   )
