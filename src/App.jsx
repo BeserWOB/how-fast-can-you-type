@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 export default function App(){
   const startingTime = 5
@@ -7,6 +7,7 @@ export default function App(){
   const [timeRemaining, setTimeRemaining] = useState(startingTime);
   const [isGameOn, setIsGameOn] = useState(false);
   const [wordCount, setWordCount] = useState(0);
+  const inputRef = useRef(null)
 
   
   function handleChange(e){
@@ -22,6 +23,8 @@ export default function App(){
     setTimeRemaining(startingTime);
     setWordCount(0);
     setText("");
+    inputRef.current.disabled = false;
+    inputRef.current.focus();
   }
 
   function endGame(){
@@ -38,17 +41,13 @@ export default function App(){
         return () => clearTimeout(timer);
     } else if(timeRemaining === 0){
           endGame();
-    }
-
-
-    }, [timeRemaining, isGameOn]);
-
+    }}, [timeRemaining, isGameOn]);
 
   return(
     <main>
       <h1>How fast can you type?</h1>
       <textarea 
-        autoFocus={isGameOn}
+        ref={inputRef}
         disabled={!isGameOn}
         value={text} 
         onChange={handleChange}/>
